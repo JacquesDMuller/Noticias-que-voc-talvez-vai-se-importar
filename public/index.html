@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Notícias que você talvez vai se importar - Um agregador de notícias com estética de jornal dos anos 1920">
+    <title>Notícias que você talvez vai se importar</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ============================================
+           CSS RESET & BASE
+           ============================================ */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            /* Colors */
+            --paper-cream: #f4f1ea;
+            --paper-aged: #e8e0d0;
+            --paper-dark: #d4c9b5;
+            --ink-black: #1a1612;
+            --ink-brown: #2d241c;
+            --wood-dark: #2a1f15;
+            --wood-medium: #3d2b1f;
+            --wood-light: #5c4530;
+            --accent-red: #8b2323;
+            --accent-gold: #c9a227;
+            
+            /* Typography */
+            --font-logo: 'UnifrakturMaguntia', cursive;
+            --font-headline: 'Playfair Display', Georgia, serif;
+            --font-body: 'Lora', 'Times New Roman', serif;
+            
+            /* Spacing */
+            --spacing-xs: 0.25rem;
+            --spacing-sm: 0.5rem;
+            --spacing-md: 1rem;
+            --spacing-lg: 1.5rem;
+            --spacing-xl: 2rem;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: linear-gradient(135deg, var(--wood-dark) 0%, var(--wood-medium) 50%, var(--wood-dark) 100%);
+            min-height: 100vh;
+            color: var(--ink-black);
+            line-height: 1.6;
+        }
+
+        /* ============================================
+           WOOD TABLE TEXTURE
+           ============================================ */
+        .table-surface {
+            background: 
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0,0,0,0.03) 2px,
+                    rgba(0,0,0,0.03) 4px
+                ),
+                linear-gradient(180deg, 
+                    var(--wood-dark) 0%, 
+                    var(--wood-medium) 20%,
+                    var(--wood-light) 50%,
+                    var(--wood-medium) 80%,
+                    var(--wood-dark) 100%
+                );
+            min-height: 100vh;
+            padding: var(--spacing-xl);
+        }
+
+        /* ============================================
+           HEADER / MASTHEAD
+           ============================================ */
+        .masthead {
+            background: var(--paper-cream);
+            border: 3px double var(--ink-black);
+            padding: var(--spacing-lg) var(--spacing-xl);
+            text-align: center;
+            margin-bottom: var(--spacing-xl);
+            position: relative;
+            box-shadow: 
+                0 4px 8px rgba(0,0,0,0.3),
+                inset 0 0 50px rgba(0,0,0,0.05);
+        }
+
+        .masthead::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            right: 8px;
+            bottom: 8px;
+            border: 1px solid var(--ink-brown);
+            pointer-events: none;
+        }
+
+        .logo {
+            font-family: var(--font-logo);
+            font-size: clamp(1.8rem, 5vw, 3.5rem);
+            color: var(--ink-black);
+            letter-spacing: 2px;
+            margin-bottom: var(--spacing-sm);
+            line-height: 1.2;
+        }
+
+        .date-line {
+            font-family: var(--font-headline);
+            font-style: italic;
+            font-size: 0.9rem;
+            color: var(--ink-brown);
+            border-top: 1px solid var(--ink-black);
+            border-bottom: 1px solid var(--ink-black);
+            padding: var(--spacing-xs) 0;
+            margin: var(--spacing-sm) auto;
+            max-width: 400px;
+        }
+
+        .edition-info {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--ink-brown);
+        }
+
+        /* ============================================
+           CATEGORY TABS
+           ============================================ */
+        .category-nav {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .category-tab {
+            background: var(--paper-aged);
+            border: 2px solid var(--ink-brown);
+            padding: var(--spacing-sm) var(--spacing-md);
+            font-family: var(--font-headline);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .category-tab:hover,
+        .category-tab.active {
+            background: var(--ink-black);
+            color: var(--paper-cream);
+            transform: translateY(-2px);
+        }
+
+        /* ============================================
+           NEWS GRID (NEWSSTAND VIEW)
+           ============================================ */
+        .newsstand {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: var(--spacing-lg);
+            perspective: 1000px;
+        }
+
+        /* ============================================
+           NEWSPAPER CARD
+           ============================================ */
+        .newspaper-card {
+            background: var(--paper-cream);
+            border: 1px solid var(--paper-dark);
+            padding: var(--spacing-md);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            transform: rotate(calc(var(--rotation, 0) * 1deg));
+            box-shadow: 
+                0 4px 6px rgba(0,0,0,0.2),
+                0 8px 16px rgba(0,0,0,0.15);
+        }
+
+        .newspaper-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                135deg,
+                transparent 40%,
+                rgba(255,255,255,0.1) 50%,
+                transparent 60%
+            );
+            pointer-events: none;
+        }
+
+        .newspaper-card:hover {
+            transform: rotate(0deg) scale(1.03) translateY(-5px);
+            box-shadow: 
+                0 12px 24px rgba(0,0,0,0.3),
+                0 20px 40px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+
+        .card-category {
+            font-family: var(--font-headline);
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent-red);
+            border-bottom: 1px solid var(--paper-dark);
+            padding-bottom: var(--spacing-xs);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .card-image {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            border: 1px solid var(--paper-dark);
+            margin-bottom: var(--spacing-sm);
+            filter: sepia(15%) contrast(1.05);
+        }
+
+        .card-headline {
+            font-family: var(--font-headline);
+            font-size: 1.1rem;
+            font-weight: 700;
+            line-height: 1.3;
+            margin-bottom: var(--spacing-sm);
+            color: var(--ink-black);
+        }
+
+        .card-excerpt {
+            font-size: 0.85rem;
+            color: var(--ink-brown);
+            line-height: 1.5;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.7rem;
+            color: var(--ink-brown);
+            border-top: 1px solid var(--paper-dark);
+            padding-top: var(--spacing-xs);
+        }
+
+        .card-date {
+            font-style: italic;
+        }
+
+        .card-readtime {
+            background: var(--ink-black);
+            color: var(--paper-cream);
+            padding: 2px 6px;
+            font-size: 0.65rem;
+        }
+
+        /* ============================================
+           READING MODAL
+           ============================================ */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.85);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: var(--spacing-lg);
+            overflow-y: auto;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--paper-cream);
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: var(--spacing-xl);
+            position: relative;
+            border: 3px double var(--ink-black);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            animation: modalZoom 0.3s ease;
+        }
+
+        @keyframes modalZoom {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: var(--spacing-md);
+            right: var(--spacing-md);
+            background: var(--ink-black);
+            color: var(--paper-cream);
+            border: none;
+            width: 36px;
+            height: 36px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .modal-close:hover {
+            background: var(--accent-red);
+        }
+
+        .modal-category {
+            font-family: var(--font-headline);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--accent-red);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .modal-headline {
+            font-family: var(--font-headline);
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-weight: 900;
+            line-height: 1.2;
+            margin-bottom: var(--spacing-md);
+            color: var(--ink-black);
+        }
+
+        .modal-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-md);
+            font-size: 0.85rem;
+            color: var(--ink-brown);
+            border-top: 1px solid var(--ink-black);
+            border-bottom: 1px solid var(--ink-black);
+            padding: var(--spacing-sm) 0;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .modal-image {
+            width: 100%;
+            max-height: 400px;
+            object-fit: cover;
+            border: 1px solid var(--paper-dark);
+            margin-bottom: var(--spacing-lg);
+            filter: sepia(10%);
+        }
+
+        .modal-body {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            column-count: 1;
+            column-gap: var(--spacing-xl);
+        }
+
+        @media (min-width: 600px) {
+            .modal-body {
+                column-count: 2;
+            }
+        }
+
+        .modal-body p {
+            margin-bottom: var(--spacing-md);
+            text-align: justify;
+            text-indent: 1.5em;
+        }
+
+        .modal-body p:first-child {
+            text-indent: 0;
+        }
+
+        .modal-body p:first-child::first-letter {
+            font-family: var(--font-headline);
+            font-size: 3.5rem;
+            float: left;
+            line-height: 1;
+            padding-right: var(--spacing-sm);
+            color: var(--accent-red);
+        }
+
+        .modal-link {
+            display: inline-block;
+            margin-top: var(--spacing-lg);
+            padding: var(--spacing-sm) var(--spacing-lg);
+            background: var(--ink-black);
+            color: var(--paper-cream);
+            text-decoration: none;
+            font-family: var(--font-headline);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: background 0.2s;
+        }
+
+        .modal-link:hover {
+            background: var(--accent-red);
+        }
+
+        /* ============================================
+           LOADING STATE
+           ============================================ */
+        .loading {
+            text-align: center;
+            padding: var(--spacing-xl) * 2;
+            color: var(--paper-cream);
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid var(--paper-dark);
+            border-top-color: var(--paper-cream);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto var(--spacing-md);
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ============================================
+           FOOTER
+           ============================================ */
+        .footer {
+            text-align: center;
+            padding: var(--spacing-xl);
+            color: var(--paper-aged);
+            font-size: 0.8rem;
+            margin-top: var(--spacing-xl);
+        }
+
+        .footer a {
+            color: var(--accent-gold);
+        }
+
+        /* ============================================
+           RESPONSIVE
+           ============================================ */
+        @media (max-width: 768px) {
+            .table-surface {
+                padding: var(--spacing-md);
+            }
+            
+            .masthead {
+                padding: var(--spacing-md);
+            }
+            
+            .newsstand {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-content {
+                padding: var(--spacing-md);
+            }
+            
+            .category-nav {
+                gap: var(--spacing-xs);
+            }
+            
+            .category-tab {
+                font-size: 0.75rem;
+                padding: var(--spacing-xs) var(--spacing-sm);
+            }
+        }
+
+        /* ============================================
+           DECORATIVE ELEMENTS
+           ============================================ */
+        .ornament {
+            text-align: center;
+            font-size: 1.5rem;
+            color: var(--ink-brown);
+            margin: var(--spacing-sm) 0;
+            letter-spacing: 10px;
+        }
+
+        .no-articles {
+            text-align: center;
+            padding: var(--spacing-xl);
+            background: var(--paper-cream);
+            border: 2px dashed var(--paper-dark);
+            color: var(--ink-brown);
+            font-style: italic;
+        }
+
+        /* Fallback image styling */
+        .card-image.fallback {
+            background: linear-gradient(135deg, var(--paper-dark) 0%, var(--paper-aged) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-headline);
+            font-size: 3rem;
+            color: var(--ink-brown);
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="table-surface">
+        <!-- Masthead -->
+        <header class="masthead">
+            <h1 class="logo">Notícias que você talvez vai se importar</h1>
+            <div class="ornament">❧ ❦ ❧</div>
+            <p class="date-line" id="currentDate"></p>
+            <p class="edition-info">Edição Automatizada • Atualizado a cada 2 horas</p>
+        </header>
+
+        <!-- Category Navigation -->
+        <nav class="category-nav" id="categoryNav">
+            <button class="category-tab active" data-category="all">Todas</button>
+        </nav>
+
+        <!-- Loading State -->
+        <div class="loading" id="loadingState">
+            <div class="loading-spinner"></div>
+            <p>Carregando as últimas notícias...</p>
+        </div>
+
+        <!-- News Grid -->
+        <main class="newsstand" id="newsstand" style="display: none;"></main>
+
+        <!-- No Articles State -->
+        <div class="no-articles" id="noArticles" style="display: none;">
+            <p>Nenhuma notícia encontrada. Tente novamente mais tarde.</p>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Agregador de notícias automatizado • Sem rastreamento • Código aberto</p>
+            <p>Hospedado com ♥ no <a href="https://pages.github.com" target="_blank">GitHub Pages</a></p>
+        </footer>
+    </div>
+
+    <!-- Reading Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+        <article class="modal-content" id="modalContent">
+            <button class="modal-close" id="modalClose" aria-label="Fechar">✕</button>
+            <p class="modal-category" id="modalCategory"></p>
+            <h2 class="modal-headline" id="modalHeadline"></h2>
+            <div class="modal-meta">
+                <span id="modalAuthor"></span>
+                <span id="modalDate"></span>
+                <span id="modalReadTime"></span>
+            </div>
+            <img class="modal-image" id="modalImage" alt="" 
+                 onerror="this.style.display='none'">
+            <div class="modal-body" id="modalBody"></div>
+            <a class="modal-link" id="modalLink" href="#" target="_blank" rel="noopener">
+                Ler original ↗
+            </a>
+        </article>
+    </div>
+
+    <script>
+        // ============================================
+        // CONSTANTS & STATE
+        // ============================================
+        const FALLBACK_IMAGE = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMjAwIiB2aWV3Qm94PSIwIDAgMzAwIDIwMCI+PHJlY3QgZmlsbD0iI2U4ZTBkMCIgd2lkdGg9IjMwMCIgaGVpZ2h0PSIyMDAiLz48dGV4dCBmaWxsPSIjMmQyNDFjIiBmb250LWZhbWlseT0ic2VyaWYiIGZvbnQtc2l6ZT0iNDAiIHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj7wn5OEPC90ZXh0Pjwvc3ZnPg==';
+        
+        let newsData = null;
+        let currentCategory = 'all';
+
+        // ============================================
+        // DOM ELEMENTS
+        // ============================================
+        const elements = {
+            currentDate: document.getElementById('currentDate'),
+            categoryNav: document.getElementById('categoryNav'),
+            loadingState: document.getElementById('loadingState'),
+            newsstand: document.getElementById('newsstand'),
+            noArticles: document.getElementById('noArticles'),
+            modalOverlay: document.getElementById('modalOverlay'),
+            modalContent: document.getElementById('modalContent'),
+            modalClose: document.getElementById('modalClose'),
+            modalCategory: document.getElementById('modalCategory'),
+            modalHeadline: document.getElementById('modalHeadline'),
+            modalAuthor: document.getElementById('modalAuthor'),
+            modalDate: document.getElementById('modalDate'),
+            modalReadTime: document.getElementById('modalReadTime'),
+            modalImage: document.getElementById('modalImage'),
+            modalBody: document.getElementById('modalBody'),
+            modalLink: document.getElementById('modalLink'),
+        };
+
+        // ============================================
+        // UTILITIES
+        // ============================================
+        function formatDate(dateString) {
+            try {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('pt-BR', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+            } catch {
+                return dateString;
+            }
+        }
+
+        function formatShortDate(dateString) {
+            try {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('pt-BR', {
+                    day: '2-digit',
+                    month: 'short'
+                });
+            } catch {
+                return '';
+            }
+        }
+
+        function getRandomRotation() {
+            return (Math.random() - 0.5) * 4; // -2 to 2 degrees
+        }
+
+        function handleImageError(img) {
+            img.onerror = null; // Prevent infinite loop
+            img.src = FALLBACK_IMAGE;
+        }
+
+        // ============================================
+        // RENDER FUNCTIONS
+        // ============================================
+        function renderCategoryTabs(categories) {
+            const tabs = ['<button class="category-tab active" data-category="all">Todas</button>'];
+            
+            for (const [id, data] of Object.entries(categories)) {
+                tabs.push(`
+                    <button class="category-tab" data-category="${id}">
+                        ${data.name}
+                    </button>
+                `);
+            }
+            
+            elements.categoryNav.innerHTML = tabs.join('');
+            
+            // Add event listeners
+            elements.categoryNav.querySelectorAll('.category-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    currentCategory = tab.dataset.category;
+                    renderArticles();
+                });
+            });
+        }
+
+        function renderArticleCard(article) {
+            const rotation = getRandomRotation();
+            const imageUrl = article.image_url || FALLBACK_IMAGE;
+            
+            return `
+                <article class="newspaper-card" 
+                         style="--rotation: ${rotation}"
+                         data-article-id="${article.id}"
+                         onclick="openArticle(${article.id})">
+                    <p class="card-category">${article.category_name || article.category}</p>
+                    <img class="card-image" 
+                         src="${imageUrl}" 
+                         alt="${article.title}"
+                         onerror="handleImageError(this)"
+                         loading="lazy">
+                    <h3 class="card-headline">${article.title}</h3>
+                    <p class="card-excerpt">${article.excerpt || ''}</p>
+                    <div class="card-meta">
+                        <span class="card-date">${formatShortDate(article.date)}</span>
+                        <span class="card-readtime">${article.read_time || 1} min</span>
+                    </div>
+                </article>
+            `;
+        }
+
+        function renderArticles() {
+            if (!newsData) return;
+            
+            let articles = [];
+            
+            if (currentCategory === 'all') {
+                // Show capa articles first, then others
+                articles = [...newsData.capa];
+                for (const [id, data] of Object.entries(newsData.categories)) {
+                    articles.push(...data.articles.filter(a => 
+                        !newsData.capa.find(c => c.id === a.id)
+                    ));
+                }
+            } else {
+                articles = newsData.categories[currentCategory]?.articles || [];
+            }
+            
+            if (articles.length === 0) {
+                elements.newsstand.style.display = 'none';
+                elements.noArticles.style.display = 'block';
+                return;
+            }
+            
+            elements.noArticles.style.display = 'none';
+            elements.newsstand.style.display = 'grid';
+            elements.newsstand.innerHTML = articles.map(renderArticleCard).join('');
+        }
+
+        // ============================================
+        // MODAL FUNCTIONS
+        // ============================================
+        function findArticleById(id) {
+            // Search in capa
+            let article = newsData.capa.find(a => a.id === id);
+            if (article) return article;
+            
+            // Search in categories
+            for (const data of Object.values(newsData.categories)) {
+                article = data.articles.find(a => a.id === id);
+                if (article) return article;
+            }
+            
+            return null;
+        }
+
+        function openArticle(articleId) {
+            const article = findArticleById(articleId);
+            if (!article) return;
+            
+            elements.modalCategory.textContent = article.category_name || article.category;
+            elements.modalHeadline.textContent = article.title;
+            elements.modalAuthor.textContent = `Por ${article.author || 'Redação'}`;
+            elements.modalDate.textContent = formatDate(article.date);
+            elements.modalReadTime.textContent = `${article.read_time || 1} min de leitura`;
+            
+            if (article.image_url) {
+                elements.modalImage.src = article.image_url;
+                elements.modalImage.alt = article.title;
+                elements.modalImage.style.display = 'block';
+                elements.modalImage.onerror = function() {
+                    this.style.display = 'none';
+                };
+            } else {
+                elements.modalImage.style.display = 'none';
+            }
+            
+            // Format content into paragraphs
+            const content = article.content || article.excerpt || 'Conteúdo não disponível.';
+            const paragraphs = content.split(/\n\n|\n/).filter(p => p.trim());
+            elements.modalBody.innerHTML = paragraphs.map(p => `<p>${p}</p>`).join('');
+            
+            elements.modalLink.href = article.link;
+            
+            elements.modalOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            elements.modalOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // ============================================
+        // DATA LOADING
+        // ============================================
+        async function loadNews() {
+            try {
+                const response = await fetch('./data/latest.json');
+                if (!response.ok) throw new Error('Failed to load news');
+                
+                newsData = await response.json();
+                
+                elements.loadingState.style.display = 'none';
+                renderCategoryTabs(newsData.categories);
+                renderArticles();
+                
+            } catch (error) {
+                console.error('Error loading news:', error);
+                elements.loadingState.innerHTML = `
+                    <p style="color: #f4f1ea;">
+                        Erro ao carregar notícias.<br>
+                        <small>Verifique se o arquivo data/latest.json existe.</small>
+                    </p>
+                `;
+            }
+        }
+
+        // ============================================
+        // EVENT LISTENERS
+        // ============================================
+        elements.modalClose.addEventListener('click', closeModal);
+        elements.modalOverlay.addEventListener('click', (e) => {
+            if (e.target === elements.modalOverlay) closeModal();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        (function init() {
+            // Set current date
+            const today = new Date();
+            elements.currentDate.textContent = formatDate(today.toISOString());
+            
+            // Load news data
+            loadNews();
+        })();
+    </script>
+</body>
+</html>
