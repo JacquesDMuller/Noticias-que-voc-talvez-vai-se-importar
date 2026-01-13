@@ -9,7 +9,9 @@ on:
 
 # Security: Minimal permissions
 permissions:
-  contents: write
+  contents: write      # Para commitar o JSON
+  pages: write         # NECESSÁRIO: Para publicar no Pages
+  id-token: write      # NECESSÁRIO: Para autenticação segura do deploy
 
 # Prevent concurrent runs
 concurrency:
