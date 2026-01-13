@@ -57,12 +57,6 @@ open public/index.html   # macOS
 5. **Retrô & Narrativas** - Histórias fascinantes
 6. **Variedades** - Curiosidades e cultura
 
-## 🔧 Configuração GitHub Pages
-
-1. Vá em **Settings** > **Pages**
-2. Source: **Deploy from a branch**
-3. Branch: `main` / Folder: `/public`
-4. Save
 
 ## 📜 Licença
 
