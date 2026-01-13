@@ -9,9 +9,9 @@ FEEDS = {
         "name": "Capa",
         "description": "Principais manchetes do dia",
         "feeds": [
-            "https://feeds.folha.uol.com.br/emcimadahora/rss091.xml",
+            "https://www.bbc.com/portuguese/index.xml",
             "https://g1.globo.com/rss/g1/",
-            "https://www.estadao.com.br/pf/api/v3/content/fetch/feed?query=%7B%22feedFormat%22%3A%22rss%22%7D",
+            "https://www.cnnbrasil.com.br/rss/",
             "https://rss.uol.com.br/feed/noticias.xml",
         ]
     },
@@ -41,9 +41,8 @@ FEEDS = {
         "name": "Brasil & Sociedade",
         "description": "Política, economia e sociedade brasileira",
         "feeds": [
-            "https://www.bbc.com/portuguese/index.xml",
-            "https://feeds.folha.uol.com.br/poder/rss091.xml",
-            "https://feeds.folha.uol.com.br/cotidiano/rss091.xml",
+            "https://www.bbc.com/portuguese/brasil/index.xml",
+            "https://www.cnnbrasil.com.br/politica/rss/",
             "https://rss.uol.com.br/feed/economia.xml",
         ]
     },
@@ -71,8 +70,8 @@ FEEDS = {
 
 # Priority order for Capa selection (articles with images first)
 CAPA_PRIORITY_DOMAINS = [
-    "folha.uol.com.br",
+    "bbc.com",
     "g1.globo.com",
-    "estadao.com.br",
+    "cnnbrasil.com.br",
     "uol.com.br",
 ]

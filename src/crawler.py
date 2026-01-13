@@ -40,6 +40,79 @@ HEADERS = {
     "Connection": "keep-alive",
 }
 
+# Blacklist keywords for sensitive content filtering
+BLACKLIST_KEYWORDS = [
+    # Morte - todas as formas
+    "morte",
+    "morto",
+    "morta",
+    "mortos",
+    "mortas",
+    "morre",      # conjugação: ele/ela morre
+    "morrem",     # conjugação: eles/elas morrem
+    "morreu",     # conjugação: ele/ela morreu
+    "morreram",   # conjugação: eles/elas morreram
+    "morrer",     # infinitivo
+    # Violência e crimes
+    "assassinato",
+    "assassinatos",
+    "assassinado",
+    "assassinada",
+    "homicídio",
+    "homicidio",
+    "sangue",
+    "estupro",
+    "estuprada",
+    "estuprador",
+    "corpo encontrado",
+    "tiroteio",
+    "baleado",
+    "baleada",
+    "esfaqueado",
+    "esfaqueada",
+    "facadas",
+    "atropelado",
+    "atropelada",
+    "atropelamento",
+    # Acidentes fatais
+    "afogado",
+    "afogada",
+    "afogados",
+    "afogamento",
+    "incêndio",
+    "incendio",
+    # Tragédias
+    "tragédia",
+    "tragedia",
+    "massacre",
+    "chacina",
+    "violência",
+    "violencia",
+    "suicídio",
+    "suicidio",
+]
+
+
+def contains_blacklisted_content(title: str, summary: str) -> bool:
+    """
+    Check if the article title or summary contains blacklisted keywords.
+    
+    Args:
+        title: Article title
+        summary: Article summary/excerpt
+        
+    Returns:
+        True if blacklisted content is found, False otherwise
+    """
+    text_to_check = f"{title} {summary}".lower()
+    
+    for keyword in BLACKLIST_KEYWORDS:
+        if keyword.lower() in text_to_check:
+            logger.info(f"  ⚠ Filtered out (blacklist): '{title[:50]}...'")
+            return True
+    
+    return False
+
 
 def fetch_feed(feed_url: str) -> list:
     """
@@ -70,12 +143,19 @@ def fetch_feed(feed_url: str) -> list:
             else:
                 pub_date = datetime.now().isoformat()
             
+            title = entry.get("title", "Sem título")
+            summary = clean_html(entry.get("summary", ""))
+            
+            # Apply blacklist filter
+            if contains_blacklisted_content(title, summary):
+                continue
+            
             entries.append({
-                "title": entry.get("title", "Sem título"),
+                "title": title,
                 "link": entry.get("link", ""),
                 "date": pub_date,
                 "author": entry.get("author", entry.get("dc_creator", "Redação")),
-                "summary": clean_html(entry.get("summary", "")),
+                "summary": summary,
             })
         
         return entries
@@ -188,6 +268,26 @@ def get_domain(url: str) -> str:
         return ""
 
 
+def sort_articles_by_date(articles: list, descending: bool = True) -> list:
+    """
+    Sort articles by publication date.
+    
+    Args:
+        articles: List of article dicts with 'date' field
+        descending: If True, most recent first; if False, oldest first
+        
+    Returns:
+        Sorted list of articles
+    """
+    def parse_date(article):
+        try:
+            return datetime.fromisoformat(article.get("date", ""))
+        except (ValueError, TypeError):
+            return datetime.min
+    
+    return sorted(articles, key=parse_date, reverse=descending)
+
+
 def crawl_category(category_id: str, category_data: dict) -> list:
     """
     Crawl all feeds for a category and return enriched articles.
@@ -214,6 +314,11 @@ def crawl_category(category_id: str, category_data: dict) -> list:
             # Fetch article content and image
             logger.info(f"  Processing: {entry['title'][:50]}...")
             article_data = fetch_article_content_and_image(entry["link"])
+            
+            # Apply blacklist filter again with full content
+            full_content = article_data.get("content") or ""
+            if contains_blacklisted_content(entry["title"], full_content):
+                continue
             
             # Build article object
             article = {
@@ -244,6 +349,9 @@ def crawl_category(category_id: str, category_data: dict) -> list:
         if len(articles) >= MAX_ARTICLES_PER_CATEGORY:
             break
     
+    # Sort articles by date (most recent first)
+    articles = sort_articles_by_date(articles, descending=True)
+    
     return articles
 
 
@@ -273,6 +381,9 @@ def select_capa_articles(all_articles: list, count: int = 6) -> list:
     if len(selected) < count:
         remaining = [a for a in all_articles if a not in selected]
         selected.extend(remaining[:count - len(selected)])
+    
+    # Sort selected capa articles by date (most recent first)
+    selected = sort_articles_by_date(selected, descending=True)
     
     return selected[:count]
 
@@ -320,7 +431,7 @@ def crawl_all_feeds() -> dict:
             "generated_at": datetime.now().isoformat(),
             "total_articles": len(all_articles),
             "crawl_duration_seconds": round(elapsed, 2),
-            "version": "1.0.0",
+            "version": "1.1.0",
         }
     }
     
@@ -345,4 +456,4 @@ def save_json(data: dict, output_path: str):
 if __name__ == "__main__":
     # Quick test
     data = crawl_all_feeds()
-    save_json(data, "../public/data/latest.json")
+    save_json(data, "../docs/data/latest.json")

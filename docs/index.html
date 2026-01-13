@@ -1,21 +1,27 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Notícias que você talvez vai se importar - Um agregador de notícias com estética de jornal dos anos 1920">
+    <meta name="description"
+        content="Notícias que você talvez vai se importar - Um agregador de notícias com estética de jornal dos anos 1920">
     <title>Notícias que você talvez vai se importar</title>
-    
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Lora:ital,wght@0,400;0,600;1,400&display=swap"
+        rel="stylesheet">
+
     <style>
         /* ============================================
            CSS RESET & BASE
            ============================================ */
-        *, *::before, *::after {
+        *,
+        *::before,
+        *::after {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
@@ -33,12 +39,12 @@
             --wood-light: #5c4530;
             --accent-red: #8b2323;
             --accent-gold: #c9a227;
-            
+
             /* Typography */
             --font-logo: 'UnifrakturMaguntia', cursive;
             --font-headline: 'Playfair Display', Georgia, serif;
             --font-body: 'Lora', 'Times New Roman', serif;
-            
+
             /* Spacing */
             --spacing-xs: 0.25rem;
             --spacing-sm: 0.5rem;
@@ -59,21 +65,18 @@
            WOOD TABLE TEXTURE
            ============================================ */
         .table-surface {
-            background: 
-                repeating-linear-gradient(
-                    90deg,
+            background:
+                repeating-linear-gradient(90deg,
                     transparent,
                     transparent 2px,
-                    rgba(0,0,0,0.03) 2px,
-                    rgba(0,0,0,0.03) 4px
-                ),
-                linear-gradient(180deg, 
-                    var(--wood-dark) 0%, 
+                    rgba(0, 0, 0, 0.03) 2px,
+                    rgba(0, 0, 0, 0.03) 4px),
+                linear-gradient(180deg,
+                    var(--wood-dark) 0%,
                     var(--wood-medium) 20%,
                     var(--wood-light) 50%,
                     var(--wood-medium) 80%,
-                    var(--wood-dark) 100%
-                );
+                    var(--wood-dark) 100%);
             min-height: 100vh;
             padding: var(--spacing-xl);
         }
@@ -88,9 +91,9 @@
             text-align: center;
             margin-bottom: var(--spacing-xl);
             position: relative;
-            box-shadow: 
-                0 4px 8px rgba(0,0,0,0.3),
-                inset 0 0 50px rgba(0,0,0,0.05);
+            box-shadow:
+                0 4px 8px rgba(0, 0, 0, 0.3),
+                inset 0 0 50px rgba(0, 0, 0, 0.05);
         }
 
         .masthead::before {
@@ -133,14 +136,22 @@
         }
 
         /* ============================================
-           CATEGORY TABS
+           CATEGORY TABS & CONTROLS
            ============================================ */
+        .nav-controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-xl);
+        }
+
         .category-nav {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
             gap: var(--spacing-sm);
-            margin-bottom: var(--spacing-xl);
         }
 
         .category-tab {
@@ -160,6 +171,36 @@
             background: var(--ink-black);
             color: var(--paper-cream);
             transform: translateY(-2px);
+        }
+
+        /* Sort Toggle Button */
+        .sort-toggle {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            background: var(--paper-cream);
+            border: 2px solid var(--ink-brown);
+            padding: var(--spacing-sm) var(--spacing-md);
+            font-family: var(--font-headline);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .sort-toggle:hover {
+            background: var(--ink-black);
+            color: var(--paper-cream);
+            transform: translateY(-2px);
+        }
+
+        .sort-toggle .sort-icon {
+            font-size: 1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .sort-toggle.ascending .sort-icon {
+            transform: rotate(180deg);
         }
 
         /* ============================================
@@ -183,9 +224,9 @@
             transition: all 0.3s ease;
             position: relative;
             transform: rotate(calc(var(--rotation, 0) * 1deg));
-            box-shadow: 
-                0 4px 6px rgba(0,0,0,0.2),
-                0 8px 16px rgba(0,0,0,0.15);
+            box-shadow:
+                0 4px 6px rgba(0, 0, 0, 0.2),
+                0 8px 16px rgba(0, 0, 0, 0.15);
         }
 
         .newspaper-card::before {
@@ -195,20 +236,18 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(
-                135deg,
-                transparent 40%,
-                rgba(255,255,255,0.1) 50%,
-                transparent 60%
-            );
+            background: linear-gradient(135deg,
+                    transparent 40%,
+                    rgba(255, 255, 255, 0.1) 50%,
+                    transparent 60%);
             pointer-events: none;
         }
 
         .newspaper-card:hover {
             transform: rotate(0deg) scale(1.03) translateY(-5px);
-            box-shadow: 
-                0 12px 24px rgba(0,0,0,0.3),
-                0 20px 40px rgba(0,0,0,0.2);
+            box-shadow:
+                0 12px 24px rgba(0, 0, 0, 0.3),
+                0 20px 40px rgba(0, 0, 0, 0.2);
             z-index: 10;
         }
 
@@ -278,7 +317,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.85);
+            background: rgba(0, 0, 0, 0.85);
             display: none;
             justify-content: center;
             align-items: center;
@@ -300,7 +339,7 @@
             padding: var(--spacing-xl);
             position: relative;
             border: 3px double var(--ink-black);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
             animation: modalZoom 0.3s ease;
         }
 
@@ -309,6 +348,7 @@
                 transform: scale(0.8);
                 opacity: 0;
             }
+
             to {
                 transform: scale(1);
                 opacity: 1;
@@ -444,7 +484,9 @@
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         /* ============================================
@@ -469,23 +511,28 @@
             .table-surface {
                 padding: var(--spacing-md);
             }
-            
+
             .masthead {
                 padding: var(--spacing-md);
             }
-            
+
             .newsstand {
                 grid-template-columns: 1fr;
             }
-            
+
             .modal-content {
                 padding: var(--spacing-md);
             }
-            
+
+            .nav-controls {
+                flex-direction: column;
+                gap: var(--spacing-sm);
+            }
+
             .category-nav {
                 gap: var(--spacing-xs);
             }
-            
+
             .category-tab {
                 font-size: 0.75rem;
                 padding: var(--spacing-xs) var(--spacing-sm);
@@ -525,6 +572,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="table-surface">
         <!-- Masthead -->
@@ -535,10 +583,19 @@
             <p class="edition-info">Edição Automatizada • Atualizado a cada 2 horas</p>
         </header>
 
-        <!-- Category Navigation -->
-        <nav class="category-nav" id="categoryNav">
-            <button class="category-tab active" data-category="all">Todas</button>
-        </nav>
+        <!-- Navigation Controls -->
+        <div class="nav-controls">
+            <!-- Category Navigation -->
+            <nav class="category-nav" id="categoryNav">
+                <button class="category-tab active" data-category="all">Todas</button>
+            </nav>
+
+            <!-- Sort Toggle -->
+            <button class="sort-toggle" id="sortToggle" title="Inverter ordem das notícias">
+                <span class="sort-icon">⬇</span>
+                <span class="sort-label">Recentes</span>
+            </button>
+        </div>
 
         <!-- Loading State -->
         <div class="loading" id="loadingState">
@@ -572,8 +629,7 @@
                 <span id="modalDate"></span>
                 <span id="modalReadTime"></span>
             </div>
-            <img class="modal-image" id="modalImage" alt="" 
-                 onerror="this.style.display='none'">
+            <img class="modal-image" id="modalImage" alt="" onerror="this.style.display='none'">
             <div class="modal-body" id="modalBody"></div>
             <a class="modal-link" id="modalLink" href="#" target="_blank" rel="noopener">
                 Ler original ↗
@@ -586,9 +642,10 @@
         // CONSTANTS & STATE
         // ============================================
         const FALLBACK_IMAGE = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMjAwIiB2aWV3Qm94PSIwIDAgMzAwIDIwMCI+PHJlY3QgZmlsbD0iI2U4ZTBkMCIgd2lkdGg9IjMwMCIgaGVpZ2h0PSIyMDAiLz48dGV4dCBmaWxsPSIjMmQyNDFjIiBmb250LWZhbWlseT0ic2VyaWYiIGZvbnQtc2l6ZT0iNDAiIHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj7wn5OEPC90ZXh0Pjwvc3ZnPg==';
-        
+
         let newsData = null;
         let currentCategory = 'all';
+        let sortAscending = false; // false = most recent first, true = oldest first
 
         // ============================================
         // DOM ELEMENTS
@@ -610,6 +667,7 @@
             modalImage: document.getElementById('modalImage'),
             modalBody: document.getElementById('modalBody'),
             modalLink: document.getElementById('modalLink'),
+            sortToggle: document.getElementById('sortToggle'),
         };
 
         // ============================================
@@ -655,7 +713,7 @@
         // ============================================
         function renderCategoryTabs(categories) {
             const tabs = ['<button class="category-tab active" data-category="all">Todas</button>'];
-            
+
             for (const [id, data] of Object.entries(categories)) {
                 tabs.push(`
                     <button class="category-tab" data-category="${id}">
@@ -663,9 +721,9 @@
                     </button>
                 `);
             }
-            
+
             elements.categoryNav.innerHTML = tabs.join('');
-            
+
             // Add event listeners
             elements.categoryNav.querySelectorAll('.category-tab').forEach(tab => {
                 tab.addEventListener('click', () => {
@@ -680,7 +738,7 @@
         function renderArticleCard(article) {
             const rotation = getRandomRotation();
             const imageUrl = article.image_url || FALLBACK_IMAGE;
-            
+
             return `
                 <article class="newspaper-card" 
                          style="--rotation: ${rotation}"
@@ -704,30 +762,60 @@
 
         function renderArticles() {
             if (!newsData) return;
-            
+
             let articles = [];
-            
+
             if (currentCategory === 'all') {
                 // Show capa articles first, then others
                 articles = [...newsData.capa];
                 for (const [id, data] of Object.entries(newsData.categories)) {
-                    articles.push(...data.articles.filter(a => 
+                    articles.push(...data.articles.filter(a =>
                         !newsData.capa.find(c => c.id === a.id)
                     ));
                 }
             } else {
                 articles = newsData.categories[currentCategory]?.articles || [];
             }
-            
+
+            // Apply sort order
+            if (sortAscending) {
+                // Reverse the array for oldest first
+                articles = [...articles].reverse();
+            }
+
             if (articles.length === 0) {
                 elements.newsstand.style.display = 'none';
                 elements.noArticles.style.display = 'block';
                 return;
             }
-            
+
             elements.noArticles.style.display = 'none';
             elements.newsstand.style.display = 'grid';
             elements.newsstand.innerHTML = articles.map(renderArticleCard).join('');
+        }
+
+        // ============================================
+        // SORT TOGGLE FUNCTION
+        // ============================================
+        function toggleSortOrder() {
+            sortAscending = !sortAscending;
+
+            // Update button UI
+            const sortIcon = elements.sortToggle.querySelector('.sort-icon');
+            const sortLabel = elements.sortToggle.querySelector('.sort-label');
+
+            if (sortAscending) {
+                elements.sortToggle.classList.add('ascending');
+                sortIcon.textContent = '⬆';
+                sortLabel.textContent = 'Antigas';
+            } else {
+                elements.sortToggle.classList.remove('ascending');
+                sortIcon.textContent = '⬇';
+                sortLabel.textContent = 'Recentes';
+            }
+
+            // Re-render articles with new order
+            renderArticles();
         }
 
         // ============================================
@@ -737,44 +825,44 @@
             // Search in capa
             let article = newsData.capa.find(a => a.id === id);
             if (article) return article;
-            
+
             // Search in categories
             for (const data of Object.values(newsData.categories)) {
                 article = data.articles.find(a => a.id === id);
                 if (article) return article;
             }
-            
+
             return null;
         }
 
         function openArticle(articleId) {
             const article = findArticleById(articleId);
             if (!article) return;
-            
+
             elements.modalCategory.textContent = article.category_name || article.category;
             elements.modalHeadline.textContent = article.title;
             elements.modalAuthor.textContent = `Por ${article.author || 'Redação'}`;
             elements.modalDate.textContent = formatDate(article.date);
             elements.modalReadTime.textContent = `${article.read_time || 1} min de leitura`;
-            
+
             if (article.image_url) {
                 elements.modalImage.src = article.image_url;
                 elements.modalImage.alt = article.title;
                 elements.modalImage.style.display = 'block';
-                elements.modalImage.onerror = function() {
+                elements.modalImage.onerror = function () {
                     this.style.display = 'none';
                 };
             } else {
                 elements.modalImage.style.display = 'none';
             }
-            
+
             // Format content into paragraphs
             const content = article.content || article.excerpt || 'Conteúdo não disponível.';
             const paragraphs = content.split(/\n\n|\n/).filter(p => p.trim());
             elements.modalBody.innerHTML = paragraphs.map(p => `<p>${p}</p>`).join('');
-            
+
             elements.modalLink.href = article.link;
-            
+
             elements.modalOverlay.classList.add('active');
             document.body.style.overflow = 'hidden';
         }
@@ -791,13 +879,13 @@
             try {
                 const response = await fetch('./data/latest.json');
                 if (!response.ok) throw new Error('Failed to load news');
-                
+
                 newsData = await response.json();
-                
+
                 elements.loadingState.style.display = 'none';
                 renderCategoryTabs(newsData.categories);
                 renderArticles();
-                
+
             } catch (error) {
                 console.error('Error loading news:', error);
                 elements.loadingState.innerHTML = `
@@ -819,6 +907,7 @@
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') closeModal();
         });
+        elements.sortToggle.addEventListener('click', toggleSortOrder);
 
         // ============================================
         // INITIALIZATION
@@ -827,10 +916,11 @@
             // Set current date
             const today = new Date();
             elements.currentDate.textContent = formatDate(today.toISOString());
-            
+
             // Load news data
             loadNews();
         })();
     </script>
 </body>
+
 </html>
