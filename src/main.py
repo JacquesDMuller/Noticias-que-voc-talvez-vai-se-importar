@@ -18,7 +18,7 @@ def main():
     # Determine output path
     script_dir = os.path.dirname(os.path.abspath(__file__))
     project_root = os.path.dirname(script_dir)
-    output_path = os.path.join(project_root, "public", "data", "latest.json")
+    output_path = os.path.join(project_root, "docs", "data", "latest.json")
     
     print("🗞️  Notícias que você talvez vai se importar")
     print("=" * 50)
